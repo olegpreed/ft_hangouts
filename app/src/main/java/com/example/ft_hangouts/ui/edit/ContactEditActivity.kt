@@ -1,40 +1,23 @@
 package com.example.ft_hangouts.ui.edit
 
-import android.content.Context
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.database.ContactDatabaseHelper
 import com.example.ft_hangouts.data.model.Contact
+import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 
-class ContactEditActivity : ComponentActivity() {
+class ContactEditActivity : BaseActivity() {
     private lateinit var dbHelper: ContactDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,11 +25,9 @@ class ContactEditActivity : ComponentActivity() {
         dbHelper = ContactDatabaseHelper(this)
         val contactId = intent.getLongExtra("CONTACT_ID", -1L)
 
-        val prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-        val savedColorArgb = prefs.getInt("primary_color", Color(0xFF6650a4).toArgb())
-
         setContent {
-            Ft_hangoutsTheme(primary = Color(savedColorArgb)) {
+            val primaryColor by primaryColorState
+            Ft_hangoutsTheme(primary = primaryColor) {
                 var contact by remember { mutableStateOf<Contact?>(null) }
 
                 LaunchedEffect(Unit) {
@@ -107,15 +88,15 @@ fun ContactEditScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (contact == null) "Add Contact" else "Edit Contact") },
+                title = { Text(if (contact == null) stringResource(R.string.add_contact) else stringResource(R.string.edit_contact)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { onSave(name, phone, email, address, notes) }) {
-                        Icon(Icons.Default.Check, contentDescription = "Save")
+                        Icon(Icons.Default.Check, contentDescription = stringResource(R.string.save))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -136,31 +117,31 @@ fun ContactEditScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text(stringResource(R.string.name)) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
             )
             OutlinedTextField(
                 value = phone,
                 onValueChange = { phone = it },
-                label = { Text("Phone Number") },
+                label = { Text(stringResource(R.string.phone_number)) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
             )
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email)) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
             )
             OutlinedTextField(
                 value = address,
                 onValueChange = { address = it },
-                label = { Text("Address") },
+                label = { Text(stringResource(R.string.address)) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
             )
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = { Text("Notes") },
+                label = { Text(stringResource(R.string.notes)) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 minLines = 3
             )

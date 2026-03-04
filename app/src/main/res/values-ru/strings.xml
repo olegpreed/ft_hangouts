@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">ft_hangouts</string>
+    <string name="contacts">Контакты</string>
+    <string name="add_contact">Добавить контакт</string>
+    <string name="edit_contact">Редактировать контакт</string>
+    <string name="contact_details">Детали контакта</string>
+    <string name="settings">Настройки</string>
+    <string name="header_color">Цвет заголовка</string>
+    <string name="language">Язык</string>
+    <string name="name">Имя</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="email">Email</string>
+    <string name="address">Адрес</string>
+    <string name="notes">Заметки</string>
+    <string name="save">Сохранить</string>
+    <string name="delete">Удалить</string>
+    <string name="message">Сообщение</string>
+    <string name="call">Позвонить</string>
+    <string name="purple">Фиолетовый</string>
+    <string name="blue">Синий</string>
+    <string name="english">Английский</string>
+    <string name="russian">Русский</string>
+    <string name="contact_not_found">Контакт не найден</string>
+    <string name="back">Назад</string>
+    <string name="send">Отправить</string>
+</resources>

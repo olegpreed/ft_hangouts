@@ -2,59 +2,53 @@ package com.example.ft_hangouts.ui.settings
 
 import android.content.Context
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.ft_hangouts.R
+import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 
-class SettingsActivity : ComponentActivity() {
+class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
         val prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-        val savedColorArgb = prefs.getInt("primary_color", Color(0xFF6650a4).toArgb())
+        val savedLanguage = prefs.getString("language", "en") ?: "en"
 
         setContent {
-            var primaryColor by remember { mutableStateOf(Color(savedColorArgb)) }
+            val primaryColor by primaryColorState
+            var currentLanguage by remember { mutableStateOf(savedLanguage) }
 
             Ft_hangoutsTheme(primary = primaryColor) {
                 SettingsScreen(
                     onBack = { finish() },
                     currentColor = primaryColor,
                     onColorSelect = { newColor ->
-                        primaryColor = newColor
+                        primaryColorState.value = newColor
                         prefs.edit().putInt("primary_color", newColor.toArgb()).apply()
+                    },
+                    currentLanguage = currentLanguage,
+                    onLanguageSelect = { lang ->
+                        if (currentLanguage != lang) {
+                            currentLanguage = lang
+                            prefs.edit().putString("language", lang).apply()
+                            // Recreate is handled by BaseActivity onResume or manually here
+                            recreate()
+                        }
                     }
                 )
             }
@@ -67,15 +61,17 @@ class SettingsActivity : ComponentActivity() {
 fun SettingsScreen(
     onBack: () -> Unit,
     currentColor: Color,
-    onColorSelect: (Color) -> Unit
+    onColorSelect: (Color) -> Unit,
+    currentLanguage: String,
+    onLanguageSelect: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -93,36 +89,55 @@ fun SettingsScreen(
                 .fillMaxSize()
         ) {
             Text(
-                text = "Header Color",
+                text = stringResource(R.string.header_color),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             
-            val colors = listOf(
-                Color(0xFF6650a4), // Default Purple
-                Color(0xFF2196F3), // Blue
-                Color(0xFF4CAF50), // Green
-                Color(0xFFF44336), // Red
-                Color(0xFFFF9800), // Orange
-                Color(0xFF009688), // Teal
-                Color(0xFF3F51B5), // Indigo
-                Color(0xFF000000)  // Black
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                ColorOption(
+                    color = Color(0xFF6650a4),
+                    isSelected = currentColor == Color(0xFF6650a4),
+                    onClick = { onColorSelect(Color(0xFF6650a4)) }
+                )
+                ColorOption(
+                    color = Color(0xFF2196F3),
+                    isSelected = currentColor == Color(0xFF2196F3),
+                    onClick = { onColorSelect(Color(0xFF2196F3)) }
+                )
+            }
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+            Text(
+                text = stringResource(R.string.language),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                colors.chunked(4).forEach { rowColors ->
-                    Column {
-                        rowColors.forEach { color ->
-                            ColorOption(
-                                color = color,
-                                isSelected = color == currentColor,
-                                onClick = { onColorSelect(color) }
-                            )
-                        }
-                    }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Button(
+                    onClick = { onLanguageSelect("en") },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (currentLanguage == "en") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (currentLanguage == "en") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.english))
+                }
+                Button(
+                    onClick = { onLanguageSelect("ru") },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (currentLanguage == "ru") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (currentLanguage == "ru") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.russian))
                 }
             }
         }

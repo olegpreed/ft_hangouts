@@ -1,56 +1,29 @@
 package com.example.ft_hangouts.ui.detail
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.database.ContactDatabaseHelper
 import com.example.ft_hangouts.data.model.Contact
+import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.chat.ChatActivity
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 
-class ContactDetailActivity : ComponentActivity() {
+class ContactDetailActivity : BaseActivity() {
     private lateinit var dbHelper: ContactDatabaseHelper
     private var refreshTrigger = mutableStateOf(0)
 
@@ -59,11 +32,9 @@ class ContactDetailActivity : ComponentActivity() {
         dbHelper = ContactDatabaseHelper(this)
         val contactId = intent.getLongExtra("CONTACT_ID", -1L)
 
-        val prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-        val savedColorArgb = prefs.getInt("primary_color", Color(0xFF6650a4).toArgb())
-
         setContent {
-            Ft_hangoutsTheme(primary = Color(savedColorArgb)) {
+            val primaryColor by primaryColorState
+            Ft_hangoutsTheme(primary = primaryColor) {
                 var contact by remember { mutableStateOf<Contact?>(null) }
                 var isLoading by remember { mutableStateOf(true) }
                 val trigger by refreshTrigger
@@ -72,7 +43,7 @@ class ContactDetailActivity : ComponentActivity() {
                     contact = dbHelper.getContact(contactId)
                     isLoading = false
                     if (contact == null && trigger > 0) {
-                        Toast.makeText(this@ContactDetailActivity, "Contact not found", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@ContactDetailActivity, getString(R.string.contact_not_found), Toast.LENGTH_SHORT).show()
                         finish()
                     }
                 }
@@ -125,18 +96,18 @@ fun ContactDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Contact Details") },
+                title = { Text(stringResource(R.string.contact_details)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = onEdit) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit")
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_contact))
                     }
                     IconButton(onClick = onDelete) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -160,9 +131,9 @@ fun ContactDetailScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            DetailItem(icon = Icons.Default.Phone, text = contact.phoneNumber, label = "Phone")
-            DetailItem(icon = Icons.Default.Email, text = contact.email, label = "Email")
-            DetailItem(icon = Icons.Default.LocationOn, text = contact.address, label = "Address")
+            DetailItem(icon = Icons.Default.Phone, text = contact.phoneNumber, label = stringResource(R.string.phone_number))
+            DetailItem(icon = Icons.Default.Email, text = contact.email, label = stringResource(R.string.email))
+            DetailItem(icon = Icons.Default.LocationOn, text = contact.address, label = stringResource(R.string.address))
 
             if (contact.notes.isNotEmpty()) {
                 Card(
@@ -171,7 +142,7 @@ fun ContactDetailScreen(
                         .padding(vertical = 8.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = "Notes", style = MaterialTheme.typography.labelLarge)
+                        Text(text = stringResource(R.string.notes), style = MaterialTheme.typography.labelLarge)
                         Text(text = contact.notes, style = MaterialTheme.typography.bodyLarge)
                     }
                 }
@@ -184,13 +155,13 @@ fun ContactDetailScreen(
                     onClick = onMessage,
                     modifier = Modifier.weight(1f).padding(end = 8.dp)
                 ) {
-                    Text("Message")
+                    Text(stringResource(R.string.message))
                 }
                 Button(
                     onClick = { /* TODO: Call */ },
                     modifier = Modifier.weight(1f).padding(start = 8.dp)
                 ) {
-                    Text("Call")
+                    Text(stringResource(R.string.call))
                 }
             }
         }

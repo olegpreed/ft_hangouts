@@ -1,9 +1,7 @@
 package com.example.ft_hangouts
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,42 +12,27 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ft_hangouts.data.model.Contact
+import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
 import com.example.ft_hangouts.ui.settings.SettingsActivity
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 import com.example.ft_hangouts.ui.viewmodel.ContactViewModel
 
-class MainActivity : ComponentActivity() {
+class MainActivity : BaseActivity() {
     private lateinit var contactViewModel: ContactViewModel
-    private var primaryColorState = mutableStateOf(Color(0xFF6650a4))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        updateThemeColor()
         
         setContent {
             val primaryColor by primaryColorState
@@ -76,15 +59,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun updateThemeColor() {
-        val prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-        val savedColorArgb = prefs.getInt("primary_color", Color(0xFF6650a4).toArgb())
-        primaryColorState.value = Color(savedColorArgb)
-    }
-
     override fun onResume() {
         super.onResume()
-        updateThemeColor()
         if (::contactViewModel.isInitialized) {
             contactViewModel.loadContacts()
         }
@@ -104,10 +80,10 @@ fun ContactListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Contacts") },
+                title = { Text(stringResource(R.string.contacts)) },
                 actions = {
                     IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -119,7 +95,7 @@ fun ContactListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddContact) {
-                Icon(Icons.Default.Add, contentDescription = "Add Contact")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_contact))
             }
         },
         modifier = Modifier.fillMaxSize()
