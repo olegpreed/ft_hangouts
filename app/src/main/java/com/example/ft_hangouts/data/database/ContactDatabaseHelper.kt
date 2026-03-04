@@ -5,12 +5,15 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.ft_hangouts.data.model.Contact
+import com.example.ft_hangouts.data.model.Message
 
 class ContactDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
         private const val DATABASE_NAME = "contacts.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
+        
+        // Contacts Table
         private const val TABLE_CONTACTS = "contacts"
         private const val KEY_ID = "id"
         private const val KEY_NAME = "name"
@@ -19,6 +22,14 @@ class ContactDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABA
         private const val KEY_ADDRESS = "address"
         private const val KEY_NOTES = "notes"
         private const val KEY_PROFILE_PICTURE = "profile_picture"
+
+        // Messages Table
+        private const val TABLE_MESSAGES = "messages"
+        private const val KEY_MSG_ID = "id"
+        private const val KEY_MSG_CONTACT_ID = "contact_id"
+        private const val KEY_MSG_TEXT = "text"
+        private const val KEY_MSG_TIMESTAMP = "timestamp"
+        private const val KEY_MSG_IS_SENT = "is_sent"
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
@@ -32,14 +43,34 @@ class ContactDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABA
                 + KEY_PROFILE_PICTURE + " TEXT"
                 + ")")
         db?.execSQL(createContactsTable)
+
+        val createMessagesTable = ("CREATE TABLE " + TABLE_MESSAGES + "("
+                + KEY_MSG_ID + " INTEGER PRIMARY KEY,"
+                + KEY_MSG_CONTACT_ID + " INTEGER,"
+                + KEY_MSG_TEXT + " TEXT,"
+                + KEY_MSG_TIMESTAMP + " INTEGER,"
+                + KEY_MSG_IS_SENT + " INTEGER,"
+                + "FOREIGN KEY(" + KEY_MSG_CONTACT_ID + ") REFERENCES " + TABLE_CONTACTS + "(" + KEY_ID + ")"
+                + ")")
+        db?.execSQL(createMessagesTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS)
-        onCreate(db)
+        if (oldVersion < 2) {
+            val createMessagesTable = ("CREATE TABLE " + TABLE_MESSAGES + "("
+                    + KEY_MSG_ID + " INTEGER PRIMARY KEY,"
+                    + KEY_MSG_CONTACT_ID + " INTEGER,"
+                    + KEY_MSG_TEXT + " TEXT,"
+                    + KEY_MSG_TIMESTAMP + " INTEGER,"
+                    + KEY_MSG_IS_SENT + " INTEGER,"
+                    + "FOREIGN KEY(" + KEY_MSG_CONTACT_ID + ") REFERENCES " + TABLE_CONTACTS + "(" + KEY_ID + ")"
+                    + ")")
+            db?.execSQL(createMessagesTable)
+        }
     }
 
-    fun addContact(contact: Contact) {
+    // Contact Methods
+    fun addContact(contact: Contact): Long {
         val db = this.writableDatabase
         val values = ContentValues().apply {
             put(KEY_NAME, contact.name)
@@ -49,8 +80,9 @@ class ContactDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABA
             put(KEY_NOTES, contact.notes)
             put(KEY_PROFILE_PICTURE, contact.profilePicture)
         }
-        db.insert(TABLE_CONTACTS, null, values)
+        val id = db.insert(TABLE_CONTACTS, null, values)
         db.close()
+        return id
     }
 
     fun getContact(id: Long): Contact? {
@@ -58,6 +90,31 @@ class ContactDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABA
         val cursor = db.query(
             TABLE_CONTACTS, arrayOf(KEY_ID, KEY_NAME, KEY_PHONE_NUMBER, KEY_EMAIL, KEY_ADDRESS, KEY_NOTES, KEY_PROFILE_PICTURE),
             "$KEY_ID=?", arrayOf(id.toString()), null, null, null, null
+        )
+        return if (cursor.moveToFirst()) {
+            val contact = Contact(
+                cursor.getLong(cursor.getColumnIndexOrThrow(KEY_ID)),
+                cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)),
+                cursor.getString(cursor.getColumnIndexOrThrow(KEY_PHONE_NUMBER)),
+                cursor.getString(cursor.getColumnIndexOrThrow(KEY_EMAIL)),
+                cursor.getString(cursor.getColumnIndexOrThrow(KEY_ADDRESS)),
+                cursor.getString(cursor.getColumnIndexOrThrow(KEY_NOTES)),
+                cursor.getString(cursor.getColumnIndexOrThrow(KEY_PROFILE_PICTURE))
+            )
+            cursor.close()
+            contact
+        } else {
+            cursor.close()
+            null
+        }
+    }
+
+    fun getContactByPhone(phoneNumber: String): Contact? {
+        val db = this.readableDatabase
+        // Simple normalization for comparison, ideally we'd do better
+        val cursor = db.query(
+            TABLE_CONTACTS, arrayOf(KEY_ID, KEY_NAME, KEY_PHONE_NUMBER, KEY_EMAIL, KEY_ADDRESS, KEY_NOTES, KEY_PROFILE_PICTURE),
+            "$KEY_PHONE_NUMBER LIKE ?", arrayOf("%$phoneNumber%"), null, null, null, null
         )
         return if (cursor.moveToFirst()) {
             val contact = Contact(
@@ -116,7 +173,46 @@ class ContactDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABA
 
     fun deleteContact(contact: Contact) {
         val db = this.writableDatabase
+        db.delete(TABLE_MESSAGES, "$KEY_MSG_CONTACT_ID = ?", arrayOf(contact.id.toString()))
         db.delete(TABLE_CONTACTS, "$KEY_ID = ?", arrayOf(contact.id.toString()))
         db.close()
+    }
+
+    // Message Methods
+    fun addMessage(message: Message): Long {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put(KEY_MSG_CONTACT_ID, message.contactId)
+            put(KEY_MSG_TEXT, message.text)
+            put(KEY_MSG_TIMESTAMP, message.timestamp)
+            put(KEY_MSG_IS_SENT, if (message.isSent) 1 else 0)
+        }
+        val id = db.insert(TABLE_MESSAGES, null, values)
+        db.close()
+        return id
+    }
+
+    fun getMessagesForContact(contactId: Long): List<Message> {
+        val messageList = mutableListOf<Message>()
+        val db = this.readableDatabase
+        val cursor = db.query(
+            TABLE_MESSAGES, null, "$KEY_MSG_CONTACT_ID = ?",
+            arrayOf(contactId.toString()), null, null, "$KEY_MSG_TIMESTAMP ASC"
+        )
+
+        if (cursor.moveToFirst()) {
+            do {
+                val message = Message(
+                    cursor.getLong(cursor.getColumnIndexOrThrow(KEY_MSG_ID)),
+                    cursor.getLong(cursor.getColumnIndexOrThrow(KEY_MSG_CONTACT_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(KEY_MSG_TEXT)),
+                    cursor.getLong(cursor.getColumnIndexOrThrow(KEY_MSG_TIMESTAMP)),
+                    cursor.getInt(cursor.getColumnIndexOrThrow(KEY_MSG_IS_SENT)) == 1
+                )
+                messageList.add(message)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return messageList
     }
 }

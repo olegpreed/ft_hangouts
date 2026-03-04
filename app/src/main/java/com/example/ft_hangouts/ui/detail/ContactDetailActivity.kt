@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import com.example.ft_hangouts.data.database.ContactDatabaseHelper
 import com.example.ft_hangouts.data.model.Contact
+import com.example.ft_hangouts.ui.chat.ChatActivity
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 
@@ -90,6 +91,13 @@ class ContactDetailActivity : ComponentActivity() {
                         onDelete = {
                             dbHelper.deleteContact(contact!!)
                             finish()
+                        },
+                        onMessage = {
+                            val intent = Intent(this@ContactDetailActivity, ChatActivity::class.java)
+                            intent.putExtra("CONTACT_ID", contact!!.id)
+                            intent.putExtra("CONTACT_NAME", contact!!.name)
+                            intent.putExtra("CONTACT_PHONE", contact!!.phoneNumber)
+                            startActivity(intent)
                         }
                     )
                 }
@@ -104,7 +112,8 @@ fun ContactDetailScreen(
     contact: Contact,
     onBack: () -> Unit,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onMessage: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -165,7 +174,7 @@ fun ContactDetailScreen(
 
             Row(modifier = Modifier.fillMaxWidth()) {
                 Button(
-                    onClick = { /* TODO: SMS */ },
+                    onClick = onMessage,
                     modifier = Modifier.weight(1f).padding(end = 8.dp)
                 ) {
                     Text("Message")
