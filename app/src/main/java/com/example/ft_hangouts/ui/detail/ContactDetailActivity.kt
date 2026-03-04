@@ -52,6 +52,7 @@ import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 
 class ContactDetailActivity : ComponentActivity() {
     private lateinit var dbHelper: ContactDatabaseHelper
+    private var refreshTrigger = mutableStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,11 +66,12 @@ class ContactDetailActivity : ComponentActivity() {
             Ft_hangoutsTheme(primary = Color(savedColorArgb)) {
                 var contact by remember { mutableStateOf<Contact?>(null) }
                 var isLoading by remember { mutableStateOf(true) }
+                val trigger by refreshTrigger
 
-                LaunchedEffect(Unit) {
+                LaunchedEffect(trigger) {
                     contact = dbHelper.getContact(contactId)
                     isLoading = false
-                    if (contact == null) {
+                    if (contact == null && trigger > 0) {
                         Toast.makeText(this@ContactDetailActivity, "Contact not found", Toast.LENGTH_SHORT).show()
                         finish()
                     }
@@ -103,6 +105,11 @@ class ContactDetailActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshTrigger.value++
     }
 }
 
