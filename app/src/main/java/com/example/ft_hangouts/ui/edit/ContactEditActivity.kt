@@ -53,6 +53,7 @@ class ContactEditActivity : BaseActivity() {
                         } else {
                             dbHelper.updateContact(updatedContact)
                         }
+                        setResult(RESULT_OK)
                         finish()
                     },
                     onBack = { finish() }

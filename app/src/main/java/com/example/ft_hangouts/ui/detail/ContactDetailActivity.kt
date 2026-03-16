@@ -26,6 +26,11 @@ import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 class ContactDetailActivity : BaseActivity() {
     private lateinit var dbHelper: ContactDatabaseHelper
     private var refreshTrigger = mutableStateOf(0)
+    private var hasChanges = false
+
+    companion object {
+        private const val REQUEST_EDIT = 2001
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,10 +64,11 @@ class ContactDetailActivity : BaseActivity() {
                         onEdit = {
                             val intent = Intent(this@ContactDetailActivity, ContactEditActivity::class.java)
                             intent.putExtra("CONTACT_ID", contact!!.id)
-                            startActivity(intent)
+                            startActivityForResult(intent, REQUEST_EDIT)
                         },
                         onDelete = {
                             dbHelper.deleteContact(contact!!)
+                            hasChanges = true
                             finish()
                         },
                         onMessage = {
@@ -81,6 +87,19 @@ class ContactDetailActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         refreshTrigger.value++
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_EDIT && resultCode == RESULT_OK) {
+            hasChanges = true
+            refreshTrigger.value++
+        }
+    }
+
+    override fun finish() {
+        setResult(if (hasChanges) RESULT_OK else RESULT_CANCELED)
+        super.finish()
     }
 }
 

@@ -33,7 +33,6 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
         setContent {
             val primaryColor by primaryColorState
             contactViewModel = viewModel()
@@ -43,12 +42,12 @@ class MainActivity : BaseActivity() {
                     contactViewModel = contactViewModel,
                     onAddContact = {
                         val intent = Intent(this, ContactEditActivity::class.java)
-                        startActivity(intent)
+                        startActivityForResult(intent, REQUEST_EDIT)
                     },
                     onContactClick = { contact ->
                         val intent = Intent(this, ContactDetailActivity::class.java)
                         intent.putExtra("CONTACT_ID", contact.id)
-                        startActivity(intent)
+                        startActivityForResult(intent, REQUEST_DETAIL)
                     },
                     onSettingsClick = {
                         val intent = Intent(this, SettingsActivity::class.java)
@@ -59,11 +58,18 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (::contactViewModel.isInitialized) {
-            contactViewModel.loadContacts()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if ((requestCode == REQUEST_EDIT || requestCode == REQUEST_DETAIL) && resultCode == RESULT_OK) {
+            if (::contactViewModel.isInitialized) {
+                contactViewModel.loadContacts()
+            }
         }
+    }
+
+    companion object {
+        private const val REQUEST_EDIT = 1001
+        private const val REQUEST_DETAIL = 1002
     }
 }
 
