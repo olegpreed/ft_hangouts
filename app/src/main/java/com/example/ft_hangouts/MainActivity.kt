@@ -24,6 +24,7 @@ import com.example.ft_hangouts.data.model.Contact
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
+import com.example.ft_hangouts.ui.landscapeLeftSafeArea
 import com.example.ft_hangouts.ui.settings.SettingsActivity
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 import com.example.ft_hangouts.ui.viewmodel.ContactViewModel
@@ -104,7 +105,9 @@ fun ContactListScreen(
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_contact))
             }
         },
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .landscapeLeftSafeArea()
     ) { innerPadding ->
         ContactList(
             contacts = contacts,

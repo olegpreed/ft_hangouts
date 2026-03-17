@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.ui.BaseActivity
+import com.example.ft_hangouts.ui.landscapeLeftSafeArea
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 
 class SettingsActivity : BaseActivity() {
@@ -80,7 +81,8 @@ fun SettingsScreen(
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        }
+        },
+        modifier = Modifier.landscapeLeftSafeArea()
     ) { innerPadding ->
         Column(
             modifier = Modifier
