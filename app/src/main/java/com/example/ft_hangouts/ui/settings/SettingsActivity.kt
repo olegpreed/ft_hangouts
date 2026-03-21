@@ -3,10 +3,7 @@ package com.example.ft_hangouts.ui.settings
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -71,12 +68,7 @@ fun SettingsScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                }
             )
         },
         modifier = Modifier.landscapeLeftSafeArea()
@@ -93,30 +85,23 @@ fun SettingsScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            Button(
-                onClick = { onThemeSelect(AppThemeVariant.COLOR_1) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (currentThemeVariant == AppThemeVariant.COLOR_1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (currentThemeVariant == AppThemeVariant.COLOR_1) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)
-            ) {
-                Text(stringResource(R.string.theme_color1))
-            }
-
-            Button(
-                onClick = { onThemeSelect(AppThemeVariant.COLOR_2) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (currentThemeVariant == AppThemeVariant.COLOR_2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (currentThemeVariant == AppThemeVariant.COLOR_2) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                ),
+            SingleChoiceSegmentedButtonRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 24.dp)
             ) {
-                Text(stringResource(R.string.theme_color2))
+                SegmentedButton(
+                    selected = currentThemeVariant == AppThemeVariant.COLOR_1,
+                    onClick = { onThemeSelect(AppThemeVariant.COLOR_1) },
+                    shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                    label = { Text(stringResource(R.string.theme_color1)) }
+                )
+                SegmentedButton(
+                    selected = currentThemeVariant == AppThemeVariant.COLOR_2,
+                    onClick = { onThemeSelect(AppThemeVariant.COLOR_2) },
+                    shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                    label = { Text(stringResource(R.string.theme_color2)) }
+                )
             }
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
@@ -127,27 +112,19 @@ fun SettingsScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Button(
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                SegmentedButton(
+                    selected = currentLanguage == "en",
                     onClick = { onLanguageSelect("en") },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentLanguage == "en") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (currentLanguage == "en") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(stringResource(R.string.english))
-                }
-                Button(
+                    shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                    label = { Text(stringResource(R.string.english)) }
+                )
+                SegmentedButton(
+                    selected = currentLanguage == "ru",
                     onClick = { onLanguageSelect("ru") },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentLanguage == "ru") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (currentLanguage == "ru") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(stringResource(R.string.russian))
-                }
+                    shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                    label = { Text(stringResource(R.string.russian)) }
+                )
             }
         }
     }
