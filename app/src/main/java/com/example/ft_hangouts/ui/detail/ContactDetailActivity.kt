@@ -1,5 +1,6 @@
 package com.example.ft_hangouts.ui.detail
 
+import android.content.res.Configuration
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ft_hangouts.R
@@ -120,6 +122,8 @@ fun ContactDetailScreen(
     onDelete: () -> Unit,
     onMessage: () -> Unit
 ) {
+    val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -137,19 +141,14 @@ fun ContactDetailScreen(
                         Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
             )
         },
         bottomBar = {
-            Surface(shadowElevation = 2.dp) {
+            Surface() {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .then(if (isPortrait) Modifier.navigationBarsPadding() else Modifier)
                         .padding(16.dp)
                 ) {
                     Button(
