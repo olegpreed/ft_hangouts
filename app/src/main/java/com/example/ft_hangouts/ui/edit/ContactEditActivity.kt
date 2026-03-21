@@ -27,8 +27,8 @@ class ContactEditActivity : BaseActivity() {
         val contactId = intent.getLongExtra("CONTACT_ID", -1L)
 
         setContent {
-            val primaryColor by primaryColorState
-            Ft_hangoutsTheme(primary = primaryColor) {
+            val themeVariant by themeVariantState
+            Ft_hangoutsTheme(themeVariant = themeVariant) {
                 var contact by remember { mutableStateOf<Contact?>(null) }
 
                 LaunchedEffect(Unit) {

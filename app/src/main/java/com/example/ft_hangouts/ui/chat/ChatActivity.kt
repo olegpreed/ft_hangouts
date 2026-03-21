@@ -36,7 +36,7 @@ class ChatActivity : BaseActivity() {
         val contactPhone = intent.getStringExtra("CONTACT_PHONE") ?: ""
 
         setContent {
-            val primaryColor by primaryColorState
+            val themeVariant by themeVariantState
             val chatViewModel: ChatViewModel = viewModel()
             val messages by chatViewModel.messages.collectAsState()
 
@@ -44,7 +44,7 @@ class ChatActivity : BaseActivity() {
                 chatViewModel.loadMessages(contactId)
             }
 
-            Ft_hangoutsTheme(primary = primaryColor) {
+            Ft_hangoutsTheme(themeVariant = themeVariant) {
                 ChatScreen(
                     contactName = contactName,
                     messages = messages,

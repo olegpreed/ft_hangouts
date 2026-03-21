@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -39,8 +41,8 @@ class ContactDetailActivity : BaseActivity() {
         val contactId = intent.getLongExtra("CONTACT_ID", -1L)
 
         setContent {
-            val primaryColor by primaryColorState
-            Ft_hangoutsTheme(primary = primaryColor) {
+            val themeVariant by themeVariantState
+            Ft_hangoutsTheme(themeVariant = themeVariant) {
                 var contact by remember { mutableStateOf<Contact?>(null) }
                 var isLoading by remember { mutableStateOf(true) }
                 val trigger by refreshTrigger
@@ -143,6 +145,22 @@ fun ContactDetailScreen(
                 )
             )
         },
+        bottomBar = {
+            Surface(shadowElevation = 2.dp) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Button(
+                        onClick = onMessage,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.message))
+                    }
+                }
+            }
+        },
         modifier = Modifier.landscapeLeftSafeArea()
     ) { innerPadding ->
         Column(
@@ -150,6 +168,7 @@ fun ContactDetailScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
             Text(
                 text = contact.name,
@@ -171,23 +190,6 @@ fun ContactDetailScreen(
                         Text(text = stringResource(R.string.notes), style = MaterialTheme.typography.labelLarge)
                         Text(text = contact.notes, style = MaterialTheme.typography.bodyLarge)
                     }
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Button(
-                    onClick = onMessage,
-                    modifier = Modifier.weight(1f).padding(end = 8.dp)
-                ) {
-                    Text(stringResource(R.string.message))
-                }
-                Button(
-                    onClick = { /* TODO: Call */ },
-                    modifier = Modifier.weight(1f).padding(start = 8.dp)
-                ) {
-                    Text(stringResource(R.string.call))
                 }
             }
         }

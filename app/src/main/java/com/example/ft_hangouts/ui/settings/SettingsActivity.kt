@@ -11,16 +11,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.landscapeLeftSafeArea
+import com.example.ft_hangouts.ui.theme.AppThemeVariant
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 
 class SettingsActivity : BaseActivity() {
@@ -31,16 +28,16 @@ class SettingsActivity : BaseActivity() {
         val savedLanguage = prefs.getString("language", "en") ?: "en"
 
         setContent {
-            val primaryColor by primaryColorState
+            val themeVariant by themeVariantState
             var currentLanguage by remember { mutableStateOf(savedLanguage) }
 
-            Ft_hangoutsTheme(primary = primaryColor) {
+            Ft_hangoutsTheme(themeVariant = themeVariant) {
                 SettingsScreen(
                     onBack = { finish() },
-                    currentColor = primaryColor,
-                    onColorSelect = { newColor ->
-                        primaryColorState.value = newColor
-                        prefs.edit().putInt("primary_color", newColor.toArgb()).apply()
+                    currentThemeVariant = themeVariant,
+                    onThemeSelect = { selectedVariant ->
+                        themeVariantState.value = selectedVariant
+                        prefs.edit().putInt("theme_variant", selectedVariant.id).apply()
                     },
                     currentLanguage = currentLanguage,
                     onLanguageSelect = { lang ->
@@ -61,8 +58,8 @@ class SettingsActivity : BaseActivity() {
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
-    currentColor: Color,
-    onColorSelect: (Color) -> Unit,
+    currentThemeVariant: AppThemeVariant,
+    onThemeSelect: (AppThemeVariant) -> Unit,
     currentLanguage: String,
     onLanguageSelect: (String) -> Unit
 ) {
@@ -91,25 +88,35 @@ fun SettingsScreen(
                 .fillMaxSize()
         ) {
             Text(
-                text = stringResource(R.string.header_color),
+                text = stringResource(R.string.theme),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-                horizontalArrangement = Arrangement.Start
+
+            Button(
+                onClick = { onThemeSelect(AppThemeVariant.COLOR_1) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (currentThemeVariant == AppThemeVariant.COLOR_1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (currentThemeVariant == AppThemeVariant.COLOR_1) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
             ) {
-                ColorOption(
-                    color = Color(0xFF6650a4),
-                    isSelected = currentColor == Color(0xFF6650a4),
-                    onClick = { onColorSelect(Color(0xFF6650a4)) }
-                )
-                ColorOption(
-                    color = Color(0xFF2196F3),
-                    isSelected = currentColor == Color(0xFF2196F3),
-                    onClick = { onColorSelect(Color(0xFF2196F3)) }
-                )
+                Text(stringResource(R.string.theme_color1))
+            }
+
+            Button(
+                onClick = { onThemeSelect(AppThemeVariant.COLOR_2) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (currentThemeVariant == AppThemeVariant.COLOR_2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (currentThemeVariant == AppThemeVariant.COLOR_2) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp)
+            ) {
+                Text(stringResource(R.string.theme_color2))
             }
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
@@ -142,31 +149,6 @@ fun SettingsScreen(
                     Text(stringResource(R.string.russian))
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun ColorOption(color: Color, isSelected: Boolean, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .padding(8.dp)
-            .size(48.dp)
-            .clip(CircleShape)
-            .background(color)
-            .clickable { onClick() }
-            .then(
-                if (isSelected) Modifier.background(color.copy(alpha = 0.5f)) else Modifier
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        if (isSelected) {
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.8f))
-            )
         }
     }
 }

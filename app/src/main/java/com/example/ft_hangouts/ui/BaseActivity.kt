@@ -5,13 +5,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import com.example.ft_hangouts.ui.theme.AppThemeVariant
 import java.text.SimpleDateFormat
 import java.util.*
 
 abstract class BaseActivity : ComponentActivity() {
-    protected val primaryColorState = mutableStateOf(Color(0xFF6650a4))
+    protected val themeVariantState = mutableStateOf(AppThemeVariant.COLOR_1)
     private var currentLanguage: String? = null
 
     companion object {
@@ -29,13 +28,13 @@ abstract class BaseActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        updateThemeColor()
+        updateThemeVariant()
     }
 
-    protected fun updateThemeColor() {
+    protected fun updateThemeVariant() {
         val prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-        val savedColorArgb = prefs.getInt("primary_color", Color(0xFF6650a4).toArgb())
-        primaryColorState.value = Color(savedColorArgb)
+        val savedThemeVariant = prefs.getInt("theme_variant", AppThemeVariant.COLOR_1.id)
+        themeVariantState.value = AppThemeVariant.fromId(savedThemeVariant)
     }
 
     override fun onStart() {
@@ -62,7 +61,7 @@ abstract class BaseActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        updateThemeColor()
+        updateThemeVariant()
         
         val prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
         val savedLanguage = prefs.getString("language", "en") ?: "en"

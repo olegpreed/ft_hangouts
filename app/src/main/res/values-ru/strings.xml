@@ -5,6 +5,7 @@
     <string name="edit_contact">Редактировать контакт</string>
     <string name="contact_details">Детали контакта</string>
     <string name="settings">Настройки</string>
+    <string name="theme">Тема</string>
     <string name="header_color">Цвет заголовка</string>
     <string name="language">Язык</string>
     <string name="name">Имя</string>
@@ -23,4 +24,6 @@
     <string name="contact_not_found">Контакт не найден</string>
     <string name="back">Назад</string>
     <string name="send">Отправить</string>
+    <string name="theme_color1">Цвет 1</string>
+    <string name="theme_color2">Цвет 2</string>
 </resources>

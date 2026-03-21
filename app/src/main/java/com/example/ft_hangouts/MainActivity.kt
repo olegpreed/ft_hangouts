@@ -35,10 +35,10 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val primaryColor by primaryColorState
+            val themeVariant by themeVariantState
             contactViewModel = viewModel()
 
-            Ft_hangoutsTheme(primary = primaryColor) {
+            Ft_hangoutsTheme(themeVariant = themeVariant) {
                 ContactListScreen(
                     contactViewModel = contactViewModel,
                     onAddContact = {
