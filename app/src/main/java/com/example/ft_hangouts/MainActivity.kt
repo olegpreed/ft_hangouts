@@ -4,21 +4,25 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ft_hangouts.data.model.Contact
 import com.example.ft_hangouts.ui.BaseActivity
@@ -83,37 +87,77 @@ fun ContactListScreen(
     onSettingsClick: () -> Unit
 ) {
     val contacts by contactViewModel.contacts.collectAsState()
+    var query by rememberSaveable { mutableStateOf("") }
+    var active by rememberSaveable { mutableStateOf(false) }
+
+    val filteredContacts = contacts.filter {
+        it.name.contains(query, ignoreCase = true) || it.phoneNumber.contains(query)
+    }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.contacts)) },
-                actions = {
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .semantics { isTraversalGroup = true }
+                    .padding(horizontal = if (active) 0.dp else 16.dp, vertical = if (active) 0.dp else 8.dp)
+            ) {
+                SearchBar(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .semantics { traversalIndex = 0f }
+                        .fillMaxWidth(),
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = query,
+                            onQueryChange = { query = it },
+                            onSearch = { active = false },
+                            expanded = active,
+                            onExpandedChange = { active = it },
+                            placeholder = { Text(stringResource(R.string.search_contacts)) },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                            trailingIcon = {
+                                Row {
+                                    if (query.isNotEmpty()) {
+                                        IconButton(onClick = { query = "" }) {
+                                            Icon(Icons.Default.Clear, contentDescription = null)
+                                        }
+                                    }
+                                    IconButton(onClick = onSettingsClick) {
+                                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
+                                    }
+                                }
+                            },
+                        )
+                    },
+                    expanded = active,
+                    onExpandedChange = { active = it },
+                ) {
+                    ContactList(
+                        contacts = filteredContacts,
+                        onContactClick = onContactClick
+                    )
+                }
+            }
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddContact) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_contact))
+            if (!active) {
+                FloatingActionButton(onClick = onAddContact) {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_contact))
+                }
             }
         },
         modifier = Modifier
             .fillMaxSize()
             .landscapeLeftSafeArea()
     ) { innerPadding ->
-        ContactList(
-            contacts = contacts,
-            onContactClick = onContactClick,
-            modifier = Modifier.padding(innerPadding)
-        )
+        if (!active) {
+            ContactList(
+                contacts = filteredContacts,
+                onContactClick = onContactClick,
+                modifier = Modifier.padding(innerPadding)
+            )
+        }
     }
 }
 
