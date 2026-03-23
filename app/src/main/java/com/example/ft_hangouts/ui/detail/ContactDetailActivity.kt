@@ -123,6 +123,30 @@ fun ContactDetailScreen(
     onMessage: () -> Unit
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(stringResource(R.string.delete_contact_title)) },
+            text = { Text(stringResource(R.string.delete_contact_message, contact.name)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDelete()
+                    }
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -137,7 +161,7 @@ fun ContactDetailScreen(
                     IconButton(onClick = onEdit) {
                         Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_contact))
                     }
-                    IconButton(onClick = onDelete) {
+                    IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
                     }
                 },
