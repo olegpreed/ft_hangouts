@@ -77,6 +77,9 @@ fun ContactEditScreen(
     var address by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
+    var nameError by remember { mutableStateOf(false) }
+    var phoneError by remember { mutableStateOf(false) }
+
     LaunchedEffect(contact) {
         contact?.let {
             name = it.name
@@ -97,7 +100,13 @@ fun ContactEditScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { onSave(name, phone, email, address, notes) }) {
+                    IconButton(onClick = {
+                        nameError = name.isBlank()
+                        phoneError = phone.isBlank()
+                        if (!nameError && !phoneError) {
+                            onSave(name, phone, email, address, notes)
+                        }
+                    }) {
                         Icon(Icons.Default.Check, contentDescription = stringResource(R.string.save))
                     }
                 },
@@ -113,14 +122,32 @@ fun ContactEditScreen(
         ) {
             OutlinedTextField(
                 value = name,
-                onValueChange = { name = it },
+                onValueChange = { 
+                    name = it
+                    if (nameError && it.isNotBlank()) nameError = false
+                },
                 label = { Text(stringResource(R.string.name)) },
+                isError = nameError,
+                supportingText = {
+                    if (nameError) {
+                        Text(stringResource(R.string.error_name_required))
+                    }
+                },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
             )
             OutlinedTextField(
                 value = phone,
-                onValueChange = { phone = it },
+                onValueChange = { 
+                    phone = it
+                    if (phoneError && it.isNotBlank()) phoneError = false
+                },
                 label = { Text(stringResource(R.string.phone_number)) },
+                isError = phoneError,
+                supportingText = {
+                    if (phoneError) {
+                        Text(stringResource(R.string.error_phone_required))
+                    }
+                },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
             )
             OutlinedTextField(
