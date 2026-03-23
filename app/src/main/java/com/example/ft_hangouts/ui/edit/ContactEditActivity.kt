@@ -2,6 +2,9 @@ package com.example.ft_hangouts.ui.edit
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -10,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.database.ContactDatabaseHelper
@@ -17,6 +21,18 @@ import com.example.ft_hangouts.data.model.Contact
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.landscapeLeftSafeArea
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
+
+private const val MAX_PHONE_DIGITS = 15
+
+private fun sanitizePhoneInput(input: String): String {
+    val hasLeadingPlus = input.firstOrNull() == '+'
+    val digitsOnly = input.filter { it.isDigit() }.take(MAX_PHONE_DIGITS)
+    return if (hasLeadingPlus) "+$digitsOnly" else digitsOnly
+}
+
+private fun isValidPhoneNumber(phone: String): Boolean {
+    return phone.matches(Regex("^\\+?\\d{7,15}$"))
+}
 
 class ContactEditActivity : BaseActivity() {
     private lateinit var dbHelper: ContactDatabaseHelper
@@ -102,7 +118,7 @@ fun ContactEditScreen(
                 actions = {
                     IconButton(onClick = {
                         nameError = name.isBlank()
-                        phoneError = phone.isBlank()
+                        phoneError = phone.isBlank() || !isValidPhoneNumber(phone)
                         if (!nameError && !phoneError) {
                             onSave(name, phone, email, address, notes)
                         }
@@ -117,7 +133,9 @@ fun ContactEditScreen(
         Column(
             modifier = Modifier
                 .padding(innerPadding)
+                .imePadding()
                 .padding(16.dp)
+                .verticalScroll(rememberScrollState())
                 .fillMaxSize()
         ) {
             OutlinedTextField(
@@ -138,16 +156,21 @@ fun ContactEditScreen(
             OutlinedTextField(
                 value = phone,
                 onValueChange = { 
-                    phone = it
-                    if (phoneError && it.isNotBlank()) phoneError = false
+                    val sanitizedPhone = sanitizePhoneInput(it)
+                    phone = sanitizedPhone
+                    if (phoneError && isValidPhoneNumber(sanitizedPhone)) phoneError = false
                 },
                 label = { Text(stringResource(R.string.phone_number)) },
                 isError = phoneError,
                 supportingText = {
                     if (phoneError) {
-                        Text(stringResource(R.string.error_phone_required))
+                        Text(
+                            if (phone.isBlank()) stringResource(R.string.error_phone_required)
+                            else stringResource(R.string.error_phone_invalid)
+                        )
                     }
                 },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
             )
             OutlinedTextField(
