@@ -4,13 +4,12 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.mutableStateOf
-import com.example.ft_hangouts.ui.theme.AppThemeVariant
+import com.example.ft_hangouts.ThemeManager
 import java.text.SimpleDateFormat
 import java.util.*
 
 abstract class BaseActivity : ComponentActivity() {
-    protected val themeVariantState = mutableStateOf(AppThemeVariant.COLOR_1)
+    protected val themeVariantState get() = ThemeManager.themeVariantState
     private var currentLanguage: String? = null
 
     companion object {
@@ -28,13 +27,6 @@ abstract class BaseActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        updateThemeVariant()
-    }
-
-    protected fun updateThemeVariant() {
-        val prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-        val savedThemeVariant = prefs.getInt("theme_variant", AppThemeVariant.COLOR_1.id)
-        themeVariantState.value = AppThemeVariant.fromId(savedThemeVariant)
     }
 
     override fun onStart() {
@@ -61,7 +53,6 @@ abstract class BaseActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        updateThemeVariant()
         
         val prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
         val savedLanguage = prefs.getString("language", "en") ?: "en"

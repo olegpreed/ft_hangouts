@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ft_hangouts.R
+import com.example.ft_hangouts.ThemeManager
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.landscapeLeftSafeArea
 import com.example.ft_hangouts.ui.theme.AppThemeVariant
@@ -33,8 +34,7 @@ class SettingsActivity : BaseActivity() {
                     onBack = { finish() },
                     currentThemeVariant = themeVariant,
                     onThemeSelect = { selectedVariant ->
-                        themeVariantState.value = selectedVariant
-                        prefs.edit().putInt("theme_variant", selectedVariant.id).apply()
+                        ThemeManager.setTheme(selectedVariant)
                     },
                     currentLanguage = currentLanguage,
                     onLanguageSelect = { lang ->
