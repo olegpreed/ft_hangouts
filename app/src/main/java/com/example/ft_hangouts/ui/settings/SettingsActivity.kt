@@ -15,7 +15,7 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.LanguageManager
 import com.example.ft_hangouts.ThemeManager
 import com.example.ft_hangouts.ui.BaseActivity
-import com.example.ft_hangouts.ui.landscapeLeftSafeArea
+import com.example.ft_hangouts.ui.landscapeHorizontalSafeArea
 import com.example.ft_hangouts.ui.theme.AppThemeVariant
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 
@@ -71,7 +71,7 @@ fun SettingsScreen(
                 }
             )
         },
-        modifier = Modifier.landscapeLeftSafeArea()
+        modifier = Modifier.landscapeHorizontalSafeArea()
     ) { innerPadding ->
         Column(
             modifier = Modifier

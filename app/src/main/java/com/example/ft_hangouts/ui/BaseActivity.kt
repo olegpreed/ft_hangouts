@@ -1,7 +1,6 @@
 package com.example.ft_hangouts.ui
 
 import android.content.Context
-import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import com.example.ft_hangouts.LanguageManager
@@ -22,10 +21,6 @@ abstract class BaseActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: Context) {
         currentLanguage = LanguageManager.currentLanguageState.value
         super.attachBaseContext(LocaleHelper.applyLocale(newBase, currentLanguage))
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
     }
 
     override fun onStart() {

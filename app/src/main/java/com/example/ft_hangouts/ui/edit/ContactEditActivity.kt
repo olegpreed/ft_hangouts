@@ -19,7 +19,7 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.database.ContactDatabaseHelper
 import com.example.ft_hangouts.data.model.Contact
 import com.example.ft_hangouts.ui.BaseActivity
-import com.example.ft_hangouts.ui.landscapeLeftSafeArea
+import com.example.ft_hangouts.ui.landscapeHorizontalSafeArea
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 
 private const val MAX_PHONE_DIGITS = 15
@@ -128,7 +128,7 @@ fun ContactEditScreen(
                 },
             )
         },
-        modifier = Modifier.landscapeLeftSafeArea()
+        modifier = Modifier.landscapeHorizontalSafeArea()
     ) { innerPadding ->
         Column(
             modifier = Modifier

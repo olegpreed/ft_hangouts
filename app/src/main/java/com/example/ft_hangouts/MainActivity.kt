@@ -28,7 +28,7 @@ import com.example.ft_hangouts.data.model.Contact
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
-import com.example.ft_hangouts.ui.landscapeLeftSafeArea
+import com.example.ft_hangouts.ui.landscapeHorizontalSafeArea
 import com.example.ft_hangouts.ui.settings.SettingsActivity
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 import com.example.ft_hangouts.ui.viewmodel.ContactViewModel
@@ -149,7 +149,7 @@ fun ContactListScreen(
         },
         modifier = Modifier
             .fillMaxSize()
-            .landscapeLeftSafeArea()
+            .landscapeHorizontalSafeArea()
     ) { innerPadding ->
         if (!active) {
             ContactList(

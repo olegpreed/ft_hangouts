@@ -13,12 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 
 @Composable
-fun Modifier.landscapeLeftSafeArea(): Modifier {
+fun Modifier.landscapeHorizontalSafeArea(): Modifier {
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     return if (isLandscape) {
         this
             .background(MaterialTheme.colorScheme.background)
-            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Start))
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Start + WindowInsetsSides.End))
     } else {
         this
     }

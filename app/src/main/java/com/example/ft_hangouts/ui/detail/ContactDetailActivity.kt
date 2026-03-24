@@ -25,7 +25,7 @@ import com.example.ft_hangouts.data.model.Contact
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.chat.ChatActivity
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
-import com.example.ft_hangouts.ui.landscapeLeftSafeArea
+import com.example.ft_hangouts.ui.landscapeHorizontalSafeArea
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
 
 class ContactDetailActivity : BaseActivity() {
@@ -62,7 +62,7 @@ class ContactDetailActivity : BaseActivity() {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .landscapeLeftSafeArea(),
+                            .landscapeHorizontalSafeArea(),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
@@ -184,7 +184,7 @@ fun ContactDetailScreen(
                 }
             }
         },
-        modifier = Modifier.landscapeLeftSafeArea()
+        modifier = Modifier.landscapeHorizontalSafeArea()
     ) { innerPadding ->
         Column(
             modifier = Modifier
