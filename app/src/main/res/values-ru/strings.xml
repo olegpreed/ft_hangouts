@@ -26,4 +26,8 @@
     <string name="send">Отправить</string>
     <string name="theme_color1">Цвет 1</string>
     <string name="theme_color2">Цвет 2</string>
+    <string name="search_contacts">Поиск контактов</string>
+    <string name="error_name_required">Имя обязательно</string>
+    <string name="error_phone_required">Номер телефона обязателен</string>
+    <string name="error_phone_invalid">Введите корректный номер телефона</string>
 </resources>

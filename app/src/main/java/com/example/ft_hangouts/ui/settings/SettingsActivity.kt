@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ft_hangouts.R
+import com.example.ft_hangouts.LanguageManager
 import com.example.ft_hangouts.ThemeManager
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.landscapeLeftSafeArea
@@ -22,8 +23,7 @@ class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        val prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-        val savedLanguage = prefs.getString("language", "en") ?: "en"
+        val savedLanguage = LanguageManager.currentLanguageState.value
 
         setContent {
             val themeVariant by themeVariantState
@@ -40,8 +40,8 @@ class SettingsActivity : BaseActivity() {
                     onLanguageSelect = { lang ->
                         if (currentLanguage != lang) {
                             currentLanguage = lang
-                            prefs.edit().putString("language", lang).apply()
-                            // Recreate is handled by BaseActivity onResume or manually here
+                            LanguageManager.setLanguage(lang)
+                            // Recreate is handled by BaseActivity onResume
                             recreate()
                         }
                     }

@@ -5,11 +5,10 @@ import android.content.res.Configuration
 import java.util.Locale
 
 object LocaleHelper {
-    fun applyLocale(context: Context): Context {
-        val prefs = context.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-        val language = prefs.getString("language", "en") ?: "en"
-        
-        val locale = Locale(language)
+    fun applyLocale(context: Context, language: String): Context {
+        val normalizedTag = language.replace('_', '-')
+        val locale = Locale.forLanguageTag(normalizedTag).takeIf { it.language.isNotBlank() }
+            ?: Locale.ENGLISH
         Locale.setDefault(locale)
         
         val config = Configuration(context.resources.configuration)

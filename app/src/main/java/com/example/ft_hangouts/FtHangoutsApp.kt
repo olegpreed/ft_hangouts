@@ -6,5 +6,6 @@ class FtHangoutsApp : Application() {
     override fun onCreate() {
         super.onCreate()
         ThemeManager.initialize(this)
+        LanguageManager.initialize(this)
     }
 }

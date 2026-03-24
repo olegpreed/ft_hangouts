@@ -4,13 +4,14 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import com.example.ft_hangouts.LanguageManager
 import com.example.ft_hangouts.ThemeManager
 import java.text.SimpleDateFormat
 import java.util.*
 
 abstract class BaseActivity : ComponentActivity() {
     protected val themeVariantState get() = ThemeManager.themeVariantState
-    private var currentLanguage: String? = null
+    private var currentLanguage: String = LanguageManager.currentLanguageState.value
 
     companion object {
         private var lastBackgroundTime: Long = 0
@@ -19,10 +20,8 @@ abstract class BaseActivity : ComponentActivity() {
     }
 
     override fun attachBaseContext(newBase: Context) {
-        val prefs = newBase.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-        val language = prefs.getString("language", "en") ?: "en"
-        currentLanguage = language
-        super.attachBaseContext(LocaleHelper.applyLocale(newBase))
+        currentLanguage = LanguageManager.currentLanguageState.value
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase, currentLanguage))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,9 +52,7 @@ abstract class BaseActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        
-        val prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-        val savedLanguage = prefs.getString("language", "en") ?: "en"
+        val savedLanguage = LanguageManager.currentLanguageState.value
         if (savedLanguage != currentLanguage) {
             recreate()
         }
