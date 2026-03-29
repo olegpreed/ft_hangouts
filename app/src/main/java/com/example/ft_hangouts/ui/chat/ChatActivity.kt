@@ -1,5 +1,7 @@
 package com.example.ft_hangouts.ui.chat
 
+import android.content.BroadcastReceiver
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -17,9 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.model.Message
+import com.example.ft_hangouts.data.receiver.SmsReceiver
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.landscapeHorizontalSafeArea
 import com.example.ft_hangouts.ui.theme.Ft_hangoutsTheme
@@ -42,6 +46,30 @@ class ChatActivity : BaseActivity() {
 
             LaunchedEffect(Unit) {
                 chatViewModel.loadMessages(contactId)
+            }
+
+            DisposableEffect(contactId) {
+                val receiver = object : BroadcastReceiver() {
+                    override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
+                        if (intent?.action != SmsReceiver.ACTION_MESSAGES_UPDATED) return
+                        val updatedContactId = intent.getLongExtra(SmsReceiver.EXTRA_CONTACT_ID, -1L)
+                        if (updatedContactId == contactId) {
+                            chatViewModel.loadMessages(contactId)
+                        }
+                    }
+                }
+
+                val filter = IntentFilter(SmsReceiver.ACTION_MESSAGES_UPDATED)
+                ContextCompat.registerReceiver(
+                    this@ChatActivity,
+                    receiver,
+                    filter,
+                    ContextCompat.RECEIVER_NOT_EXPORTED
+                )
+
+                onDispose {
+                    unregisterReceiver(receiver)
+                }
             }
 
             Ft_hangoutsTheme(themeVariant = themeVariant) {
