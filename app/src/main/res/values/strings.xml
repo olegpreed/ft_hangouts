@@ -24,8 +24,8 @@
     <string name="contact_not_found">Contact not found</string>
     <string name="back">Back</string>
     <string name="send">Send</string>
-    <string name="theme_color1">Color 1</string>
-    <string name="theme_color2">Color 2</string>
+    <string name="theme_color1">42 green</string>
+    <string name="theme_color2">42 blue</string>
     <string name="search_contacts">Search contacts</string>
     <string name="error_name_required">Name is required</string>
     <string name="error_phone_required">Phone number is required</string>
