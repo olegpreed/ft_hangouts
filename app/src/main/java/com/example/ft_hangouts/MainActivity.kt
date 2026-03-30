@@ -1,7 +1,10 @@
 package com.example.ft_hangouts
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,6 +26,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ft_hangouts.data.model.Contact
 import com.example.ft_hangouts.ui.BaseActivity
@@ -35,9 +39,14 @@ import com.example.ft_hangouts.ui.viewmodel.ContactViewModel
 
 class MainActivity : BaseActivity() {
     private lateinit var contactViewModel: ContactViewModel
+    private val smsPermissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestSmsPermissionsIfNeeded()
+
         setContent {
             val themeVariant by themeVariantState
             contactViewModel = viewModel()
@@ -60,6 +69,20 @@ class MainActivity : BaseActivity() {
                     }
                 )
             }
+        }
+    }
+
+    private fun requestSmsPermissionsIfNeeded() {
+        val missingPermissions = arrayOf(
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.READ_SMS
+        ).filter { permission ->
+            ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missingPermissions.isNotEmpty()) {
+            smsPermissionsLauncher.launch(missingPermissions.toTypedArray())
         }
     }
 
